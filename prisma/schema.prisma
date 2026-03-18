@@ -22,6 +22,7 @@ model User {
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  orders        Order[]
 
   role   String? @default("user")
   status String? @default("active")
@@ -76,4 +77,99 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+model Meal {
+  id               Int          @id @default(autoincrement())
+  name             String
+  slug             String       @unique
+  category         MealCategory
+  price            Float
+  discountPrice    Float?
+  rating           Float        @default(0)
+  reviewCount      Int          @default(0)
+  shortDescription String?
+  description      String?
+  mainImage        String?
+
+  options    MealOption[]
+  images     MealImage[]
+  reviews    Review[]
+  orderItems OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model MealOption {
+  id     Int        @id @default(autoincrement())
+  mealId Int
+  type   OptionType
+  name   String
+  price  Float
+
+  meal Meal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+}
+
+model MealImage {
+  id     Int    @id @default(autoincrement())
+  mealId Int
+  image  String
+
+  meal Meal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id      Int     @id @default(autoincrement())
+  mealId  Int
+  userId  Int
+  rating  Int
+  comment String?
+
+  meal Meal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+}
+
+enum OptionType {
+  size
+  addon
+}
+
+enum MealCategory {
+  BURGER
+  CHICKEN
+  PIZZA
+  DESSERTS
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  DELIVERED
+  CANCELLED
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  userId      String
+  totalAmount Float
+  status      OrderStatus @default(PENDING)
+
+  user  User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items OrderItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model OrderItem {
+  id       String @id @default(cuid())
+  orderId  String
+  mealId   Int
+  quantity Int
+  price    Float
+
+  order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  meal  Meal  @relation(fields: [mealId], references: [id], onDelete: Cascade)
 }

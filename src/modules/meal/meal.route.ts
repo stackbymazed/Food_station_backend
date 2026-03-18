@@ -1,9 +1,12 @@
 import express from "express"
+import { MealController } from "./meal.controller"
 
 const router = express.Router();
 
-router.post("/meal", (req, res) => {
-    res.send("create meal post")
-})
+// Define route for creating a meal
+router.post("/", MealController.createMeal);
 
-export const MealRouter = router
+router.get("/", MealController.getAllMeals);
+router.get("/:id", MealController.getSingleMeal);
+
+export const MealRouter = router;
