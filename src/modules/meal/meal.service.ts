@@ -1,66 +1,89 @@
 import { prisma } from "../../lib/prisma"
 
+// ─────────────────────────────────────────────
+// Types
+// ─────────────────────────────────────────────
+interface GetAllMealsQuery {
+    searchTerm?: string;
+    sortBy?: "priceLowToHigh" | "priceHighToLow" | "topRated" | "newest" | string;
+    page?: string | number;
+    limit?: string | number;
+}
+
+// ─────────────────────────────────────────────
+// Create Meal
+// ─────────────────────────────────────────────
 const createMeal = async (data: any) => {
-    // Extract relations from the incoming data
     const { options, images, ...mealData } = data;
 
-    // Build Prisma query payload
-    const prismaData: any = {
-        ...mealData,
-    };
+    const prismaData: any = { ...mealData };
 
-    // If options are provided, add them using a nested create
     if (options && Array.isArray(options) && options.length > 0) {
-        prismaData.options = {
-            create: options,
-        };
+        prismaData.options = { create: options };
     }
 
-    // If images are provided, add them using a nested create
     if (images && Array.isArray(images) && images.length > 0) {
         prismaData.images = {
             create: images.map((img: any) => ({
-                image: img.image || img
+                image: img.image || img,
             })),
         };
     }
 
-    // Insert into DB with associated relations
     const result = await prisma.meal.create({
         data: prismaData,
-        include: {
-            options: true,
-            images: true,
-        }
+        include: { options: true, images: true },
     });
 
     return result;
-}
+};
 
-const getAllMeals = async (query: any) => {
+// ─────────────────────────────────────────────
+// Get All Meals (Search + Sort + Pagination)
+// ─────────────────────────────────────────────
+const getAllMeals = async (query: GetAllMealsQuery) => {
     const {
-        searchTerm,
-        sortBy = "createdAt",
-        sortOrder = "desc",
+        searchTerm = "",
+        sortBy = "newest",
         page = 1,
         limit = 8,
     } = query;
 
-    const skip = (Number(page) - 1) * Number(limit);
+    const pageNum = Math.max(1, Number(page));
+    const limitNum = Math.min(Math.max(1, Number(limit)), 50);
+    const skip = (pageNum - 1) * limitNum;
 
-    // 🔍 Search condition
-    const whereCondition: any = searchTerm
+    console.log(`[GET MEALS] search: "${searchTerm}", sort: "${sortBy}", page: ${pageNum}`);
+
+    // ─── 🔍 Search ───────────────────────────
+    // Search across: name, category, shortDescription
+    const trimmed = searchTerm.trim();
+
+    const whereCondition: any = trimmed
         ? {
             OR: [
                 {
                     name: {
-                        contains: searchTerm,
+                        contains: trimmed,
                         mode: "insensitive",
                     },
                 },
                 {
                     category: {
-                        contains: searchTerm,
+                        // Prisma enum filter via string cast
+                        in: Object.values({
+                            BURGER: "BURGER",
+                            CHICKEN: "CHICKEN",
+                            PIZZA: "PIZZA",
+                            DESSERTS: "DESSERTS",
+                        }).filter((cat) =>
+                            cat.toLowerCase().includes(trimmed.toLowerCase())
+                        ),
+                    },
+                },
+                {
+                    shortDescription: {
+                        contains: trimmed,
                         mode: "insensitive",
                     },
                 },
@@ -68,25 +91,60 @@ const getAllMeals = async (query: any) => {
         }
         : {};
 
-    // 🔽 Sorting
-    let orderBy: any = {};
+    // ─── 🔽 Sort ─────────────────────────────
+    let orderBy: any;
 
-    if (sortBy === "priceLowToHigh") {
-        orderBy = { price: "asc" };
-    } else if (sortBy === "priceHighToLow") {
-        orderBy = { price: "desc" };
-    } else if (sortBy === "topRated") {
-        orderBy = { rating: "desc" };
-    } else {
-        orderBy = { createdAt: "desc" };
+    const sortKey = (sortBy || "newest").trim();
+
+    switch (sortKey) {
+        case "priceLowToHigh":
+            orderBy = { price: "asc" };
+            break;
+        case "priceHighToLow":
+            orderBy = { price: "desc" };
+            break;
+        case "topRated":
+            orderBy = { rating: "desc" };
+            break;
+        case "newest":
+        default:
+            orderBy = { createdAt: "desc" };
+            break;
     }
 
-    // 📄 Query
-    const result = await prisma.meal.findMany({
-        where: whereCondition,
-        orderBy,
-        skip,
-        take: Number(limit),
+    // ─── 📄 Fetch ─────────────────────────────
+    const [result, total] = await Promise.all([
+        prisma.meal.findMany({
+            where: whereCondition,
+            orderBy,
+            skip,
+            take: limitNum,
+            include: {
+                options: true,
+                images: true,
+                reviews: true,
+            },
+        }),
+        prisma.meal.count({ where: whereCondition }),
+    ]);
+
+    return {
+        meta: {
+            total,
+            page: pageNum,
+            limit: limitNum,
+            totalPage: Math.ceil(total / limitNum),
+        },
+        data: result,
+    };
+};
+
+// ─────────────────────────────────────────────
+// Get Single Meal
+// ─────────────────────────────────────────────
+const getSingleMeal = async (id: number) => {
+    const result = await prisma.meal.findUnique({
+        where: { id },
         include: {
             options: true,
             images: true,
@@ -94,39 +152,11 @@ const getAllMeals = async (query: any) => {
         },
     });
 
-    // 📊 Total count (pagination)
-    const total = await prisma.meal.count({
-        where: whereCondition,
-    });
-
-    return {
-        meta: {
-            total,
-            page: Number(page),
-            limit: Number(limit),
-            totalPage: Math.ceil(total / Number(limit)),
-        },
-        data: result,
-    };
-};
-
-const getSingleMeal = async (id: number) => {
-    const result = await prisma.meal.findUnique({
-        where: {
-            id,
-        },
-        include: {
-            options: true,
-            images: true,
-            reviews: true
-        }
-    });
-
     return result;
-}
+};
 
 export const MealServices = {
     createMeal,
     getAllMeals,
     getSingleMeal,
-}
+};
