@@ -5,6 +5,7 @@ import { prisma } from "../../lib/prisma"
 // ─────────────────────────────────────────────
 interface GetAllMealsQuery {
     searchTerm?: string;
+    category?: string;
     sortBy?: "priceLowToHigh" | "priceHighToLow" | "topRated" | "newest" | string;
     page?: string | number;
     limit?: string | number;
@@ -44,6 +45,7 @@ const createMeal = async (data: any) => {
 const getAllMeals = async (query: GetAllMealsQuery) => {
     const {
         searchTerm = "",
+        category = "",
         sortBy = "newest",
         page = 1,
         limit = 8,
@@ -59,37 +61,33 @@ const getAllMeals = async (query: GetAllMealsQuery) => {
     // Search across: name, category, shortDescription
     const trimmed = searchTerm.trim();
 
-    const whereCondition: any = trimmed
-        ? {
-            OR: [
-                {
-                    name: {
-                        contains: trimmed,
-                        mode: "insensitive",
-                    },
+    const whereCondition: any = {};
+    const orConditions: any[] = [];
+
+    if (trimmed) {
+        orConditions.push(
+            { name: { contains: trimmed, mode: "insensitive" } },
+            {
+                category: {
+                    in: Object.values({
+                        BURGER: "BURGER",
+                        CHICKEN: "CHICKEN",
+                        PIZZA: "PIZZA",
+                        DESSERTS: "DESSERTS",
+                    }).filter((cat) => cat.toLowerCase().includes(trimmed.toLowerCase())),
                 },
-                {
-                    category: {
-                        // Prisma enum filter via string cast
-                        in: Object.values({
-                            BURGER: "BURGER",
-                            CHICKEN: "CHICKEN",
-                            PIZZA: "PIZZA",
-                            DESSERTS: "DESSERTS",
-                        }).filter((cat) =>
-                            cat.toLowerCase().includes(trimmed.toLowerCase())
-                        ),
-                    },
-                },
-                {
-                    shortDescription: {
-                        contains: trimmed,
-                        mode: "insensitive",
-                    },
-                },
-            ],
-        }
-        : {};
+            },
+            { shortDescription: { contains: trimmed, mode: "insensitive" } }
+        );
+    }
+
+    if (orConditions.length > 0) {
+        whereCondition.OR = orConditions;
+    }
+
+    if (category && category.toUpperCase() !== "ALL") {
+        whereCondition.category = category.toUpperCase();
+    }
 
     // ─── 🔽 Sort ─────────────────────────────
     let orderBy: any;

@@ -32,8 +32,9 @@ const createMeal = async (req: Request, res: Response) => {
 // ─────────────────────────────────────────────
 const getAllMeals = async (req: Request, res: Response) => {
     try {
-        const { searchTerm = "", sortBy = "newest", page = "1", limit = "8" } = req.query as {
+        const { searchTerm = "", category = "", sortBy = "newest", page = "1", limit = "8" } = req.query as {
             searchTerm?: string;
+            category?: string;
             sortBy?: string;
             page?: string;
             limit?: string;
@@ -41,6 +42,7 @@ const getAllMeals = async (req: Request, res: Response) => {
 
         const result = await MealServices.getAllMeals({
             searchTerm,
+            category,
             sortBy,
             page,
             limit,
