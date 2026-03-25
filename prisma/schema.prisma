@@ -27,6 +27,8 @@ model User {
   role   String? @default("user")
   status String? @default("active")
 
+  cart Cart?
+
   @@unique([email])
   @@map("user")
 }
@@ -96,6 +98,7 @@ model Meal {
   images     MealImage[]
   reviews    Review[]
   orderItems OrderItem[]
+  cartItems  CartItem[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -172,4 +175,28 @@ model OrderItem {
 
   order Order @relation(fields: [orderId], references: [id], onDelete: Cascade)
   meal  Meal  @relation(fields: [mealId], references: [id], onDelete: Cascade)
+}
+
+model Cart {
+  id        String     @id @default(cuid())
+  userId    String     @unique
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+
+  @@map("cart")
+}
+
+model CartItem {
+  id       String @id @default(cuid())
+  cartId   String
+  mealId   Int
+  quantity Int    @default(1)
+
+  cart Cart @relation(fields: [cartId], references: [id], onDelete: Cascade)
+  meal Meal @relation(fields: [mealId], references: [id], onDelete: Cascade)
+
+  @@index([cartId])
+  @@map("cart_item")
 }
