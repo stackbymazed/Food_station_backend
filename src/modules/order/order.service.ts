@@ -45,7 +45,26 @@ const getUserOrders = async (userId: string) => {
     return result;
 }
 
+const getAllOrders = async () => {
+    const result = await prisma.order.findMany({
+        include: {
+            items: {
+                include: {
+                    meal: true
+                }
+            },
+            user: true
+        },
+        orderBy: {
+            createdAt: 'desc'
+        }
+    });
+
+    return result;
+}
+
 export const OrderServices = {
     createOrder,
     getUserOrders,
+    getAllOrders,
 }

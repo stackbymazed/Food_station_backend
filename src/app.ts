@@ -6,6 +6,8 @@ import cors from "cors";
 
 import { OrderRouter } from "./modules/order/order.route";
 import { CartRouter } from "./modules/cart/cart.route";
+import { UserRouter } from "./modules/user/user.route";
+import { PaymentRouter } from "./modules/payment/payment.route";
 
 const app = express();
 
@@ -20,6 +22,8 @@ app.all('/api/auth/{*any}', toNodeHandler(auth));
 app.use("/meal", MealRouter)
 app.use("/order", OrderRouter)
 app.use("/cart", CartRouter)
+app.use("/user", UserRouter)
+app.use("/payment", PaymentRouter)
 
 app.get('/', (req: Request, res: Response) => {
   res.send('Hello World!')

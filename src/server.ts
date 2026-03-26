@@ -10,7 +10,7 @@ async function main() {
             console.log(`Example app listening on port ${port}`)
         })
     } catch (err) {
-        console.log("something wrong", err);
+        // console.log("something wrong", err);
         await prisma.$disconnect();
         process.exit(1);
     }

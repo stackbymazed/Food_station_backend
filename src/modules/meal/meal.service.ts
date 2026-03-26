@@ -55,7 +55,7 @@ const getAllMeals = async (query: GetAllMealsQuery) => {
     const limitNum = Math.min(Math.max(1, Number(limit)), 50);
     const skip = (pageNum - 1) * limitNum;
 
-    console.log(`[GET MEALS] search: "${searchTerm}", sort: "${sortBy}", page: ${pageNum}`);
+    // console.log(`[GET MEALS] search: "${searchTerm}", sort: "${sortBy}", page: ${pageNum}`);
 
     // ─── 🔍 Search ───────────────────────────
     // Search across: name, category, shortDescription

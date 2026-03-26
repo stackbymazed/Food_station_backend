@@ -4,7 +4,7 @@ import { prisma } from "../lib/prisma";
 
 async function seedAdmin() {
     try {
-        console.log(" Admin Seeding Started...");
+        // console.log(" Admin Seeding Started...");
 
         const adminData = {
             name: "Admin Mia",
@@ -14,7 +14,7 @@ async function seedAdmin() {
             password: "admin1234",
         };
 
-        console.log(" Checking if admin already exists...");
+        // console.log(" Checking if admin already exists...");
 
         const existingUser = await prisma.user.findUnique({
             where: {
@@ -23,11 +23,11 @@ async function seedAdmin() {
         });
 
         if (existingUser) {
-            console.log(" Admin already exists!");
+            // console.log(" Admin already exists!");
             return;
         }
 
-        console.log(" Creating admin via Better Auth API...");
+        // console.log(" Creating admin via Better Auth API...");
 
         const response = await fetch(
             "http://localhost:5000/api/auth/sign-up/email",
@@ -44,11 +44,11 @@ async function seedAdmin() {
         const result = await response.json();
 
         if (!response.ok) {
-            console.log("Better Auth error:", result);
+            // console.log("Better Auth error:", result);
             throw new Error("Failed to create admin via Better Auth");
         }
 
-        console.log("Admin created successfully!");
+        // console.log("Admin created successfully!");
 
         await prisma.user.update({
             where: {
@@ -59,11 +59,11 @@ async function seedAdmin() {
             },
         });
 
-        console.log(" Email verification status updated!");
-        console.log(" Admin seeding completed successfully!");
+        // console.log(" Email verification status updated!");
+        // console.log(" Admin seeding completed successfully!");
 
     } catch (error) {
-        console.error(" Admin seeding failed:", error);
+        // console.error(" Admin seeding failed:", error);
     } finally {
         await prisma.$disconnect();
     }
