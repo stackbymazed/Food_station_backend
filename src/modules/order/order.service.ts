@@ -63,8 +63,17 @@ const getAllOrders = async () => {
     return result;
 }
 
+const updateOrderStatus = async (id: string, status: string) => {
+    const result = await prisma.order.update({
+        where: { id },
+        data: { status: status as any }
+    });
+    return result;
+}
+
 export const OrderServices = {
     createOrder,
     getUserOrders,
     getAllOrders,
+    updateOrderStatus,
 }

@@ -7,5 +7,6 @@ router.post("/", OrderController.createOrder);
 router.get("/", OrderController.getAllOrders);
 
 router.get("/user/:userId", OrderController.getUserOrders);
+router.patch("/:id", OrderController.updateOrderStatus);
 
 export const OrderRouter = router;

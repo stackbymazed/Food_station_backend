@@ -149,6 +149,7 @@ enum MealCategory {
 enum OrderStatus {
   PENDING
   PROCESSING
+  ACCEPTED
   DELIVERED
   CANCELLED
 }

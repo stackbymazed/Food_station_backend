@@ -62,8 +62,37 @@ const getAllOrders = async (req: Request, res: Response) => {
     }
 }
 
+const updateOrderStatus = async (req: Request, res: Response) => {
+    try {
+        const id = req.params.id as string;
+        const { status } = req.body;
+        
+        if (!id || !status) {
+            return res.status(400).json({
+                success: false,
+                message: "id and status are required"
+            });
+        }
+
+        const result = await OrderServices.updateOrderStatus(id, status as string);
+        
+        res.status(200).json({
+            success: true,
+            message: "Order status updated successfully",
+            data: result
+        });
+    } catch (err: any) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to update order status",
+            error: err.message || err
+        });
+    }
+}
+
 export const OrderController = {
     createOrder,
     getUserOrders,
     getAllOrders,
+    updateOrderStatus,
 }
