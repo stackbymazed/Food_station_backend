@@ -121,6 +121,7 @@ const getAllMeals = async (query: GetAllMealsQuery) => {
                 options: true,
                 images: true,
                 reviews: true,
+                provider: true,
             },
         }),
         prisma.meal.count({ where: whereCondition }),

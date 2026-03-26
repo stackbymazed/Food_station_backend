@@ -19,8 +19,16 @@ const deleteUser = async (id: string) => {
     });
 };
 
+const getProviders = async () => {
+    return await prisma.user.findMany({
+        where: { role: "provider" },
+        orderBy: { createdAt: "desc" },
+    });
+};
+
 export const UserService = {
     getAllUsers,
+    getProviders,
     updateUser,
     deleteUser,
 };

@@ -21,7 +21,7 @@ const getAllUsers = async (req: Request, res: Response) => {
 const updateUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        const result = await UserService.updateUser(id, req.body);
+        const result = await UserService.updateUser(id as string, req.body);
         res.status(200).json({
             success: true,
             message: "User updated successfully",
@@ -39,7 +39,7 @@ const updateUser = async (req: Request, res: Response) => {
 const deleteUser = async (req: Request, res: Response) => {
     try {
         const { id } = req.params;
-        await UserService.deleteUser(id);
+        await UserService.deleteUser(id as string);
         res.status(200).json({
             success: true,
             message: "User deleted successfully",
@@ -53,8 +53,26 @@ const deleteUser = async (req: Request, res: Response) => {
     }
 };
 
+const getProviders = async (req: Request, res: Response) => {
+    try {
+        const result = await UserService.getProviders();
+        res.status(200).json({
+            success: true,
+            message: "Providers fetched successfully",
+            data: result,
+        });
+    } catch (err: any) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to fetch providers",
+            error: err.message,
+        });
+    }
+};
+
 export const UserController = {
     getAllUsers,
+    getProviders,
     updateUser,
     deleteUser,
 };
