@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { MealServices } from "./meal.service"
+import { MealServices } from "./meal.service.js"
 
 // ─────────────────────────────────────────────
 // POST /meal  →  Create a new meal

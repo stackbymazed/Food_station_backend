@@ -1,11 +1,11 @@
 import { Request, Response } from "express"
-import { CartServices } from "./cart.service"
-import { auth } from "../../lib/auth"
+import { CartServices } from "./cart.service.js"
+import { auth } from "../../lib/auth.js"
 
 const getSessionUser = async (req: Request) => {
     // better-auth session retrieval
     const session = await auth.api.getSession({
-        headers: req.headers
+        headers: new Headers(req.headers as any)
     });
     return session?.user;
 }

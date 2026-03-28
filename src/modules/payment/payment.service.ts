@@ -1,4 +1,4 @@
-import stripe from "../../lib/stripe";
+import stripe from "../../lib/stripe.js";
 
 export const paymentService = {
   createPaymentIntent: async (amount: number, currency: string = "usd") => {

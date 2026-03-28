@@ -1,6 +1,6 @@
-import { Role } from "../constants/role";
-import { Status } from "../constants/status";
-import { prisma } from "../lib/prisma";
+import { Role } from "../constants/role.js";
+import { Status } from "../constants/status.js";
+import { prisma } from "../lib/prisma.js";
 
 async function seedAdmin() {
     try {
@@ -30,12 +30,12 @@ async function seedAdmin() {
         // console.log(" Creating admin via Better Auth API...");
 
         const response = await fetch(
-            "http://localhost:5000/api/auth/sign-up/email",
+            "https://food-station-backend.vercel.app/api/auth/sign-up/email",
             {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    "Origin": "http://localhost:3000"
+                    "Origin": "https://food-station-bd.vercel.app"
                 },
                 body: JSON.stringify(adminData),
             }

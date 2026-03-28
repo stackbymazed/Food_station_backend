@@ -1,4 +1,4 @@
-import { prisma } from "../../lib/prisma"
+import { prisma } from "../../lib/prisma.js"
 
 const getCart = async (userId: string) => {
     let cart = await prisma.cart.findUnique({
@@ -33,7 +33,7 @@ const getCart = async (userId: string) => {
 const addToCart = async (userId: string, mealId: number, quantity: number = 1) => {
     const cart = await getCart(userId);
 
-    const existingItem = cart.items.find(item => item.mealId === mealId);
+    const existingItem = cart.items.find((item: any) => item.mealId === mealId);
 
     if (existingItem) {
         return await prisma.cartItem.update({
