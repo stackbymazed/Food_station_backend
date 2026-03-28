@@ -14,6 +14,12 @@ export const auth = betterAuth({
     emailAndPassword: {
         enabled: true,
     },
+    socialProviders: {
+        google: {
+            clientId: process.env.GOOGLE_CLIENT_ID as string,
+            clientSecret: process.env.GOOGLE_CLIENT_SECRET as string,
+        }
+    },
     user: {
         additionalFields: {
             role: {
@@ -39,8 +45,8 @@ export const auth = betterAuth({
             enabled: true
         },
         defaultCookieAttributes: {
-            sameSite: "none",
-            secure: true
+            sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+            secure: process.env.NODE_ENV === "production"
         }
     }
 });
