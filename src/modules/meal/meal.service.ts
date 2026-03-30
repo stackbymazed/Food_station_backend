@@ -120,7 +120,6 @@ const getAllMeals = async (query: GetAllMealsQuery) => {
             include: {
                 options: true,
                 images: true,
-                reviews: true,
                 provider: true,
             },
         }),
