@@ -71,9 +71,9 @@ export const sendRoleUpdateEmail = async (userEmail: string, userName: string, n
             subject: "🚀 Account Update: New Role Assigned",
             html: html,
         });
-        console.log("Email sent successfully to", userEmail);
+        // console.log("Email sent successfully to", userEmail);
     } catch (error) {
-        console.error("Error sending email:", error);
+        // console.error("Error sending email:", error);
     }
 };
 
@@ -132,8 +132,8 @@ export const sendStatusUpdateEmail = async (userEmail: string, userName: string,
             subject: `🔔 Account Status: ${label}`,
             html: html,
         });
-        console.log("Status update email sent to", userEmail);
+        // console.log("Status update email sent to", userEmail);
     } catch (error) {
-        console.error("Error sending status email:", error);
+        // console.error("Error sending status email:", error);
     }
 };

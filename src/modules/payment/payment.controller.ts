@@ -4,7 +4,7 @@ import { paymentService } from "./payment.service.js";
 export const paymentController = {
   createPaymentIntent: async (req: Request, res: Response) => {
     try {
-      console.log("[PAYMENT_CONTROLLER] Received body:", req.body);
+      // console.log("[PAYMENT_CONTROLLER] Received body:", req.body);
       const { amount, currency } = req.body;
       const result = await paymentService.createPaymentIntent(Number(amount), currency);
       res.json({
