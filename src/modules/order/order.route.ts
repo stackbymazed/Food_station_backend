@@ -8,5 +8,6 @@ router.get("/", OrderController.getAllOrders);
 
 router.get("/user/:userId", OrderController.getUserOrders);
 router.patch("/:id", OrderController.updateOrderStatus);
+router.delete("/:id", OrderController.deleteOrder);
 
 export const OrderRouter = router;

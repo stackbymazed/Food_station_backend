@@ -71,9 +71,17 @@ const updateOrderStatus = async (id: string, status: string) => {
     return result;
 }
 
+const deleteOrder = async (id: string) => {
+    const result = await prisma.order.delete({
+        where: { id }
+    });
+    return result;
+}
+
 export const OrderServices = {
     createOrder,
     getUserOrders,
     getAllOrders,
     updateOrderStatus,
+    deleteOrder,
 }

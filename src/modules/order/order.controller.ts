@@ -4,7 +4,7 @@ import { OrderServices } from "./order.service.js"
 const createOrder = async (req: Request, res: Response) => {
     try {
         const result = await OrderServices.createOrder(req.body);
-        
+
         res.status(201).json({
             success: true,
             message: "Order created successfully",
@@ -29,7 +29,7 @@ const getUserOrders = async (req: Request, res: Response) => {
             });
         }
         const result = await OrderServices.getUserOrders(userId);
-        
+
         res.status(200).json({
             success: true,
             message: "Orders fetched successfully",
@@ -47,7 +47,7 @@ const getUserOrders = async (req: Request, res: Response) => {
 const getAllOrders = async (req: Request, res: Response) => {
     try {
         const result = await OrderServices.getAllOrders();
-        
+
         res.status(200).json({
             success: true,
             message: "Orders fetched successfully",
@@ -66,7 +66,7 @@ const updateOrderStatus = async (req: Request, res: Response) => {
     try {
         const id = req.params.id as string;
         const { status } = req.body;
-        
+
         if (!id || !status) {
             return res.status(400).json({
                 success: false,
@@ -75,7 +75,7 @@ const updateOrderStatus = async (req: Request, res: Response) => {
         }
 
         const result = await OrderServices.updateOrderStatus(id, status as string);
-        
+
         res.status(200).json({
             success: true,
             message: "Order status updated successfully",
@@ -90,9 +90,35 @@ const updateOrderStatus = async (req: Request, res: Response) => {
     }
 }
 
+const deleteOrder = async (req: Request, res: Response) => {
+    try {
+        const id = req.params.id as string;
+        if (!id) {
+            return res.status(400).json({
+                success: false,
+                message: "id is required"
+            });
+        }
+        const result = await OrderServices.deleteOrder(id);
+
+        res.status(200).json({
+            success: true,
+            message: "Order deleted successfully",
+            data: result
+        });
+    } catch (err: any) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to delete order",
+            error: err.message || err
+        });
+    }
+}
+
 export const OrderController = {
     createOrder,
     getUserOrders,
     getAllOrders,
     updateOrderStatus,
+    deleteOrder,
 }
