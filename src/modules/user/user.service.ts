@@ -1,4 +1,5 @@
 import { prisma } from "../../lib/prisma.js"
+import { sendRoleUpdateEmail, sendStatusUpdateEmail } from "../../lib/nodemailer.js"
 
 const getAllUsers = async () => {
     return await prisma.user.findMany({
@@ -7,10 +8,22 @@ const getAllUsers = async () => {
 };
 
 const updateUser = async (id: string, data: any) => {
-    return await prisma.user.update({
+    const result = await prisma.user.update({
         where: { id },
         data: data,
     });
+
+    // If role is updated, send email
+    if (data.role) {
+        sendRoleUpdateEmail(result.email, result.name, data.role);
+    }
+
+    // If status is updated, send email
+    if (data.status) {
+        sendStatusUpdateEmail(result.email, result.name, data.status);
+    }
+
+    return result;
 };
 
 const deleteUser = async (id: string) => {
